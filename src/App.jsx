@@ -1,15 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Navbar from './components/ui/Navbar';
 import Loader from './components/ui/Loader';
 import Hero from './components/sections/Hero';
-import About from './components/sections/About';
-import Manifesto from './components/sections/Manifesto';
-import Skills from './components/sections/Skills';
-import Projects from './components/sections/Projects';
-import Gallery from './components/sections/Gallery';
-import Contact from './components/sections/Contact';
+
+// Lazy load all below-the-fold sections so the initial bundle is small
+const About     = lazy(() => import('./components/sections/About'));
+const Manifesto = lazy(() => import('./components/sections/Manifesto'));
+const Skills    = lazy(() => import('./components/sections/Skills'));
+const Projects  = lazy(() => import('./components/sections/Projects'));
+const Gallery   = lazy(() => import('./components/sections/Gallery'));
+const Contact   = lazy(() => import('./components/sections/Contact'));
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -21,29 +23,18 @@ function App() {
       document.body.style.overflow = 'hidden';
       return;
     }
-    
     document.body.style.overflow = '';
 
-    // Reveal animations on scroll (excluding the manifesto which has its own GSAP pin logic)
     const sections = document.querySelectorAll('section:not(#manifesto)');
     sections.forEach((section) => {
       gsap.fromTo(section,
         { opacity: 0, y: 50 },
-        {
-          opacity: 1, y: 0, duration: 1, ease: 'power3.out',
-          scrollTrigger: {
-            trigger: section,
-            start: 'top 80%',
-          }
-        }
+        { opacity: 1, y: 0, duration: 1, ease: 'power3.out',
+          scrollTrigger: { trigger: section, start: 'top 80%' } }
       );
     });
 
-    // Refresh ScrollTrigger after loader is gone to ensure correct layout calculations
-    setTimeout(() => {
-      ScrollTrigger.refresh();
-    }, 100);
-
+    setTimeout(() => { ScrollTrigger.refresh(); }, 100);
   }, [isLoading]);
 
   return (
@@ -53,12 +44,14 @@ function App() {
         <Navbar />
         <main className="flex flex-col gap-24 lg:gap-32 pb-32">
           <Hero />
-          <About />
-          <Manifesto />
-          <Skills />
-          <Projects />
-          <Gallery />
-          <Contact />
+          <Suspense fallback={null}>
+            <About />
+            <Manifesto />
+            <Skills />
+            <Projects />
+            <Gallery />
+            <Contact />
+          </Suspense>
         </main>
       </div>
     </>
