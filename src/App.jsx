@@ -21,10 +21,13 @@ function App() {
   useEffect(() => {
     if (isLoading) {
       document.body.style.overflow = 'hidden';
-      return;
+    } else {
+      document.body.style.overflow = '';
+      setTimeout(() => { ScrollTrigger.refresh(); }, 100);
     }
-    document.body.style.overflow = '';
+  }, [isLoading]);
 
+  useEffect(() => {
     const sections = document.querySelectorAll('section:not(#manifesto)');
     sections.forEach((section) => {
       gsap.fromTo(section,
@@ -33,14 +36,12 @@ function App() {
           scrollTrigger: { trigger: section, start: 'top 80%' } }
       );
     });
-
-    setTimeout(() => { ScrollTrigger.refresh(); }, 100);
-  }, [isLoading]);
+  }, []);
 
   return (
     <>
       {isLoading && <Loader onComplete={() => setIsLoading(false)} />}
-      <div className={`relative w-full bg-[#050814] selection:bg-[#00f6ff]/30 text-gray-200 ${isLoading ? 'h-screen overflow-hidden' : ''}`}>
+      <div className="relative w-full bg-[#050814] selection:bg-[#00f6ff]/30 text-gray-200">
         <Navbar />
         <main className="pb-32 section-container">
           <Hero />
