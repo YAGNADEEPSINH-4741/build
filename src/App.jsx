@@ -4,10 +4,10 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Navbar from './components/ui/Navbar';
 import Loader from './components/ui/Loader';
 import Hero from './components/sections/Hero';
+import About from './components/sections/About';
+import Manifesto from './components/sections/Manifesto';
 
-// Lazy load all below-the-fold sections so the initial bundle is small
-const About     = lazy(() => import('./components/sections/About'));
-const Manifesto = lazy(() => import('./components/sections/Manifesto'));
+// Lazy load below-the-fold sections
 const Skills    = lazy(() => import('./components/sections/Skills'));
 const Projects  = lazy(() => import('./components/sections/Projects'));
 const Gallery   = lazy(() => import('./components/sections/Gallery'));
@@ -42,11 +42,11 @@ function App() {
       {isLoading && <Loader onComplete={() => setIsLoading(false)} />}
       <div className={`relative w-full bg-[#050814] selection:bg-[#00f6ff]/30 text-gray-200 ${isLoading ? 'h-screen overflow-hidden' : ''}`}>
         <Navbar />
-        <main className="flex flex-col gap-24 lg:gap-32 pb-32">
+        <main className="pb-32 section-container">
           <Hero />
+          <About />
+          <Manifesto />
           <Suspense fallback={null}>
-            <About />
-            <Manifesto />
             <Skills />
             <Projects />
             <Gallery />

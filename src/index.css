@@ -6,6 +6,15 @@
   body {
     @apply bg-background text-gray-200;
   }
+  
+  /* Replace flex gaps with margins so GSAP pin-spacer block formatting works */
+  .section-container > section, .section-container > .pin-spacer {
+    @apply mb-24 lg:mb-32;
+  }
+  
+  .section-container > *:last-child {
+    @apply mb-0;
+  }
 }
 
 @layer utilities {

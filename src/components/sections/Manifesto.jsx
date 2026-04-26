@@ -11,28 +11,38 @@ export default function Manifesto() {
 
   useEffect(() => {
     let ctx = gsap.context(() => {
-      // The horizontal scroll timeline
+      // The horizontal scroll timeline using xPercent for bulletproof width calculation
       gsap.to(textRef.current, {
-        x: () => -(textRef.current.scrollWidth - window.innerWidth),
+        xPercent: -100,
+        x: () => window.innerWidth,
         ease: "none",
         scrollTrigger: {
           trigger: containerRef.current,
           start: "top top",
           pin: true,
           scrub: 1,
-          end: () => "+=" + textRef.current.scrollWidth,
+          end: () => "+=" + (textRef.current ? textRef.current.scrollWidth : window.innerWidth * 3),
           invalidateOnRefresh: true, // Handle window resizing accurately
         },
       });
     }, containerRef);
 
-    // Fallback refresh to guarantee GSAP calculates the final width after all custom fonts drop in
-    const fontRefresher = setTimeout(() => {
+    // Refresh ScrollTrigger when all custom fonts finish loading
+    document.fonts.ready.then(() => {
       ScrollTrigger.refresh();
-    }, 1500);
+    });
+
+    // Also observe the text container for any late width changes
+    const resizeObserver = new ResizeObserver(() => {
+      ScrollTrigger.refresh();
+    });
+    
+    if (textRef.current) {
+      resizeObserver.observe(textRef.current);
+    }
 
     return () => {
-      clearTimeout(fontRefresher);
+      resizeObserver.disconnect();
       ctx.revert();
     };
   }, []);
@@ -45,7 +55,7 @@ export default function Manifesto() {
     >
       <div
         ref={textRef}
-        className="flex items-center gap-12 md:gap-24 px-12 md:px-24 whitespace-nowrap will-change-transform"
+        className="flex w-max items-center gap-12 md:gap-24 px-12 md:px-24 whitespace-nowrap will-change-transform"
       >
         <span className="text-6xl md:text-8xl lg:text-[10rem] font-display font-light text-white tracking-tight">
           I don't just write code
