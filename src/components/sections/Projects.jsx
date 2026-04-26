@@ -16,7 +16,7 @@ export default function Projects() {
         "Automated CI/CD pipeline via Vercel for zero-downtime deployments.",
         "Maintained structured Git workflow and professional version control."
       ],
-      link: "#",
+      link: "https://talkprivate.vercel.app/",
     }
   ];
 
@@ -62,13 +62,9 @@ export default function Projects() {
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <a href={project.link} className="flex items-center gap-2 px-6 py-3 bg-white text-surface rounded-lg font-bold hover:bg-primary transition-colors">
+                  <a href={project.link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-6 py-3 bg-white text-surface rounded-lg font-bold hover:bg-primary transition-colors">
                     <ExternalLink className="w-4 h-4" />
                     Live Demo
-                  </a>
-                  <a href="#" className="flex items-center gap-2 px-6 py-3 bg-surface/50 text-white rounded-lg font-bold hover:bg-surface border border-white/10 transition-colors">
-                    <Github className="w-4 h-4" />
-                    Source Code
                   </a>
                 </div>
               </div>

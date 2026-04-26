@@ -10,14 +10,31 @@ export default function Manifesto() {
 
   useEffect(() => {
     let ctx = gsap.context(() => {
-      // The horizontal scroll timeline mapped to the ENTIRE document scroll
+      // Fade in the background only when reaching the #about section
+      gsap.fromTo(
+        "#manifesto-background",
+        { opacity: 0 },
+        {
+          opacity: 0.12, // Increased visibility
+          ease: "power2.inOut",
+          scrollTrigger: {
+            trigger: "#about",
+            start: "top bottom",
+            end: "top center",
+            scrub: true,
+          },
+        }
+      );
+
+      // The horizontal scroll timeline mapped from #about to the ENTIRE document bottom
       gsap.to(textRef.current, {
         xPercent: -100,
         x: () => window.innerWidth,
         ease: "none",
         scrollTrigger: {
-          trigger: document.body,
-          start: "top top",
+          trigger: "#about",
+          start: "top bottom",
+          endTrigger: document.body,
           end: "bottom bottom",
           scrub: 1,
           invalidateOnRefresh: true,
@@ -38,7 +55,7 @@ export default function Manifesto() {
   return (
     <div
       id="manifesto-background"
-      className="fixed inset-0 z-[1] pointer-events-none flex items-center overflow-hidden opacity-[0.03] md:opacity-5"
+      className="fixed inset-0 z-[1] pointer-events-none flex items-center overflow-hidden opacity-0"
     >
       <div
         ref={textRef}
