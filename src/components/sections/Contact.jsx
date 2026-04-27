@@ -1,6 +1,44 @@
+import { useState, useEffect, useRef } from 'react';
+import emailjs from '@emailjs/browser';
 import { Mail, Phone, MapPin, Github, Send, Linkedin } from 'lucide-react';
+import gsap from 'gsap';
 
 export default function Contact() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    title: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null); // 'success' | 'error' | null
+
+  const handleChange = (e) => {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+    
+    try {
+      await emailjs.send("service_n77eei7", "template_z86lsda", {
+        name: formData.name,
+        title: formData.title,
+        email: formData.email,
+        message: formData.message
+      }, "iCnNgmF00ynWF70sr");
+      setSubmitStatus('success');
+      setFormData({ name: '', email: '', title: '', message: '' }); // Clear form
+    } catch (error) {
+      console.error("Failed to send email:", error);
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <section id="contact" className="relative py-24 z-10 max-w-7xl mx-auto px-6 lg:px-8 w-full">
       <div className="text-center mb-16">
@@ -40,20 +78,28 @@ export default function Contact() {
 
         {/* Contact Form */}
         <div className="glass-card p-8">
-          <form className="flex flex-col gap-6" onSubmit={(e) => e.preventDefault()}>
+          <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-gray-400 ml-1">Your Name</label>
+                <label className="text-sm font-medium text-gray-400 ml-1">Your Name *</label>
                 <input 
                   type="text" 
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
                   placeholder="John Doe"
                   className="bg-surface/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-gray-600"
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-gray-400 ml-1">Your Email</label>
+                <label className="text-sm font-medium text-gray-400 ml-1">Your Email *</label>
                 <input 
                   type="email" 
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
                   placeholder="john@example.com"
                   className="bg-surface/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-gray-600"
                 />
@@ -61,27 +107,44 @@ export default function Contact() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-400 ml-1">Subject</label>
+              <label className="text-sm font-medium text-gray-400 ml-1">Subject *</label>
               <input 
                 type="text" 
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                required
                 placeholder="Job Opportunity"
                 className="bg-surface/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-gray-600"
               />
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-400 ml-1">Message</label>
+              <label className="text-sm font-medium text-gray-400 ml-1">Message *</label>
               <textarea 
+                name="message"
+                value={formData.message}
+                onChange={handleChange}
+                required
                 rows="5"
                 placeholder="Hello Yagnadeepsinh..."
                 className="bg-surface/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-gray-600 resize-none"
               ></textarea>
             </div>
 
-            <button type="submit" className="group flex justify-center items-center gap-2 w-full mt-4 bg-primary text-surface font-bold py-4 rounded-xl hover:bg-white transition-all duration-300 shadow-[0_0_20px_rgba(0,246,255,0.2)] hover:shadow-[0_0_30px_rgba(255,255,255,0.4)]">
-              Send Message
-              <Send className="w-5 h-5 group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />
+            <button 
+              type="submit" 
+              disabled={isSubmitting}
+              className={`group flex justify-center items-center gap-2 w-full mt-4 bg-primary text-surface font-bold py-4 rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(0,246,255,0.2)] hover:shadow-[0_0_30px_rgba(255,255,255,0.4)] ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-white'}`}
+            >
+              {isSubmitting ? 'Sending...' : 'Send Message'}
+              {!isSubmitting && <Send className="w-5 h-5 group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />}
             </button>
+            
+            {submitStatus === 'success' && <SuccessMessage />}
+            {submitStatus === 'error' && (
+              <p className="text-red-400 text-center text-sm font-medium mt-2">Failed to send message. Please try again later.</p>
+            )}
           </form>
         </div>
       </div>
@@ -118,5 +181,31 @@ function SocialLink({ icon, href, target }) {
     <a href={href} target={target} rel={target === "_blank" ? "noopener noreferrer" : undefined} className="w-12 h-12 rounded-xl bg-surface/50 border border-white/5 flex items-center justify-center text-gray-400 hover:text-primary hover:border-primary/30 hover:bg-primary/5 transition-all duration-300">
       {icon}
     </a>
+  );
+}
+
+function SuccessMessage() {
+  const charsRef = useRef([]);
+  const text = "Message sent successfully!";
+
+  useEffect(() => {
+    gsap.fromTo(charsRef.current,
+      { opacity: 0.5, filter: 'blur(5px)' },
+      { opacity: 1, filter: 'blur(0px)', duration: 0.8, stagger: 0.02, ease: "power2.out" }
+    );
+  }, []);
+
+  return (
+    <p className="text-green-400 text-center text-sm font-medium mt-2 flex justify-center">
+      {text.split('').map((char, i) => (
+        <span 
+          key={i} 
+          ref={el => charsRef.current[i] = el} 
+          style={{ whiteSpace: 'pre' }}
+        >
+          {char}
+        </span>
+      ))}
+    </p>
   );
 }

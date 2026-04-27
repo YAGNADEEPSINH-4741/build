@@ -15,7 +15,7 @@ export default function Manifesto() {
         "#manifesto-background",
         { opacity: 0 },
         {
-          opacity: 0.12, // Increased visibility
+          opacity: 0.35, // Increased visibility to be clearly seen over components
           ease: "power2.inOut",
           scrollTrigger: {
             trigger: "#about",
@@ -55,7 +55,7 @@ export default function Manifesto() {
   return (
     <div
       id="manifesto-background"
-      className="fixed inset-0 z-[1] pointer-events-none flex items-center overflow-hidden opacity-0"
+      className="fixed inset-0 z-[100] pointer-events-none flex items-center overflow-hidden opacity-0 mix-blend-difference"
     >
       <div
         ref={textRef}
